@@ -78,9 +78,20 @@ public class BinarySearchTree : IEnumerable<int>
         }
     }
 
+    /// <summary>
+    /// Problem 3 - Traverse Backwards
+    /// Mirror of TraverseForward: visit right subtree first (largest values),
+    /// then the current node, then the left subtree (smallest values).
+    /// This produces descending order.
+    /// </summary>
     private void TraverseBackward(Node? node, List<int> values)
     {
-        // TODO Problem 3
+        if (node is not null)
+        {
+            TraverseBackward(node.Right, values);  // Visit right (larger) first
+            values.Add(node.Data);
+            TraverseBackward(node.Left, values);   // Then left (smaller)
+        }
     }
 
     /// <summary>
@@ -99,8 +110,10 @@ public class BinarySearchTree : IEnumerable<int>
     }
 }
 
-public static class IntArrayExtensionMethods {
-    public static string AsString(this IEnumerable array) {
+public static class IntArrayExtensionMethods
+{
+    public static string AsString(this IEnumerable array)
+    {
         return "<IEnumerable>{" + string.Join(", ", array.Cast<int>()) + "}";
     }
 }
