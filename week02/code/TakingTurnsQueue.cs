@@ -1,3 +1,5 @@
+using System;
+
 public class TakingTurnsQueue
 {
     private readonly PersonQueue _people = new();
@@ -17,20 +19,21 @@ public class TakingTurnsQueue
             throw new InvalidOperationException("No one in the queue.");
         }
 
+        // Pull the next person from the front
         Person person = _people.Dequeue();
 
         if (person.Turns <= 0)
         {
-            // Infinite turns: Always put them back at the end of the line.
+            // FIX: If turns are 0 or negative, they stay in the queue forever.
             _people.Enqueue(person);
         }
         else if (person.Turns > 1)
         {
-            // Finite turns: Subtract one and re-enqueue if turns remain.
+            // FIX: If they have more than 1 turn left, decrement and re-enqueue.
             person.Turns -= 1;
             _people.Enqueue(person);
         }
-        // If person.Turns was 1, they are not re-enqueued (they leave the queue).
+        // If person.Turns is exactly 1, they take their final turn and are NOT re-enqueued.
 
         return person;
     }

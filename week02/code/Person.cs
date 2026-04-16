@@ -11,7 +11,6 @@ public class Person
 
     public override string ToString()
     {
-        // Helpful for debugging: shows "Forever" for 0 or negative turns.
         return Turns <= 0 ? $"({Name}:Forever)" : $"({Name}:{Turns})";
     }
 }
