@@ -11,7 +11,8 @@ public class TakingTurnsQueueTests
     // Scenario: Create a queue with the following people and turns: Bob (2), Tim (5), Sue (3) and
     // run until the queue is empty
     // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, Sue, Tim, Tim
-    // Defect(s) Found: 
+    // Defect(s) Found: No defects found. All finite-turn players cycle correctly
+    // and are removed when their turns reach zero. Test passes.
     public void TestTakingTurnsQueue_FiniteRepetition()
     {
         var bob = new Person("Bob", 2);
@@ -43,7 +44,9 @@ public class TakingTurnsQueueTests
     // Scenario: Create a queue with the following people and turns: Bob (2), Tim (5), Sue (3)
     // After running 5 times, add George with 3 turns.  Run until the queue is empty.
     // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, George, Sue, Tim, George, Tim, George
-    // Defect(s) Found: 
+    // Defect(s) Found: No defects found. Mid-queue addition works correctly. George is inserted
+    // at the back of the queue at the time AddPerson is called (after index 4, i.e. after
+    // the second Tim), and everyone cycles and exits correctly. Test passes.
     public void TestTakingTurnsQueue_AddPlayerMidway()
     {
         var bob = new Person("Bob", 2);
@@ -85,7 +88,11 @@ public class TakingTurnsQueueTests
     // Scenario: Create a queue with the following people and turns: Bob (2), Tim (Forever), Sue (3)
     // Run 10 times.
     // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, Sue, Tim, Tim
-    // Defect(s) Found: 
+    // Defect(s) Found: DEFECT - GetNextPerson only re-enqueued a person when Turns > 1,
+    // but had NO branch for the infinite-turns case (Turns <= 0). Tim (Turns = 0) was
+    // dequeued but never re-enqueued, causing him to disappear after his first turn.
+    // Fix: Added an explicit check — if Turns <= 0, re-enqueue the person without
+    // modifying their Turns value so it stays at the original 0 (or negative).
     public void TestTakingTurnsQueue_ForeverZero()
     {
         var timTurns = 0;
@@ -116,7 +123,11 @@ public class TakingTurnsQueueTests
     // Scenario: Create a queue with the following people and turns: Tim (Forever), Sue (3)
     // Run 10 times.
     // Expected Result: Tim, Sue, Tim, Sue, Tim, Sue, Tim, Tim, Tim, Tim
-    // Defect(s) Found: 
+    // Defect(s) Found: DEFECT - Same root cause as ForeverZero. GetNextPerson had no branch
+    // for Turns <= 0. Tim (Turns = -3) was dequeued but never re-enqueued, so he vanished
+    // after his first turn and Sue appeared in every subsequent slot.
+    // Fix: The same <= 0 check described above also handles negative values, and the
+    // original negative value (-3) is preserved unmodified.
     public void TestTakingTurnsQueue_ForeverNegative()
     {
         var timTurns = -3;
@@ -143,7 +154,8 @@ public class TakingTurnsQueueTests
     [TestMethod]
     // Scenario: Try to get the next person from an empty queue
     // Expected Result: Exception should be thrown with appropriate error message.
-    // Defect(s) Found: 
+    // Defect(s) Found: No defects found. An InvalidOperationException with the message
+    // "No one in the queue." is thrown correctly when the queue is empty. Test passes.
     public void TestTakingTurnsQueue_Empty()
     {
         var players = new TakingTurnsQueue();
